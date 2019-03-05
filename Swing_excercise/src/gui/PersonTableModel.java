@@ -12,7 +12,6 @@ import model.Person;
  *
  */
 public class PersonTableModel extends AbstractTableModel {
-
 	
 	private List<Person> db;
 	private String[] columnNames = {"ID", "Name",  "Occupation", "AgeCategory", "EmplyomentCategory", "USCitizen", "TaxId", "Gender"};

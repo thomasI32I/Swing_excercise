@@ -1,8 +1,6 @@
 package gui;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
@@ -12,6 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+
 import model.Person;
 
 /**
@@ -24,7 +23,7 @@ public class TablePanel extends JPanel {
 	private PersonTableModel tableModel;
 	private JPopupMenu popUp;
 	
-//	private PersonTableListener personTableListener;
+	//private PersonTableListener personTableListener;
 	
 	
 	public TablePanel() {

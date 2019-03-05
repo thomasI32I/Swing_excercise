@@ -2,6 +2,7 @@ package controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
 import gui.FormEvent;
@@ -17,7 +18,14 @@ import model.Person;
  */
 public class Controller {
 
-	private Database db = new Database();
+	private Database db;
+
+	/**
+	 * 
+	 */
+	public Controller() {
+		db = new Database();
+	}
 
 	public List<Person> getPeople() {
 		return db.getPeople();
@@ -78,6 +86,22 @@ public class Controller {
 
 	public void removePerson(int row) {
 		db.removePerson(row);
+	}
+
+	public void save() throws SQLException {
+		db.save();
+	}
+
+	public void load() throws SQLException {
+		db.load();
+	}
+
+	public void connect() throws SQLException  {
+		db.connect();
+	}
+
+	public void disconnect() {
+		db.disconnect();
 	}
 
 	/**
