@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -20,7 +21,17 @@ public class TextPanel extends JPanel {
 	 * Constructor
 	 */
 	public TextPanel() {
-		textArea = new JTextArea();		
+		textArea = new JTextArea();
+		
+		setLayout(new BorderLayout());		
+		add(new JScrollPane(textArea), BorderLayout.CENTER);
+	}
+	
+	/**
+	 * Constructor
+	 */
+	public TextPanel(String name) {
+		textArea = new JTextArea(name);		
 		setLayout(new BorderLayout());		
 		add(new JScrollPane(textArea), BorderLayout.CENTER);
 	}

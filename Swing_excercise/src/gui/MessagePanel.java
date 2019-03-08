@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -23,6 +24,8 @@ import model.Message;
 public class MessagePanel extends JPanel {
 
 	private JTree serverTree;
+	private TextPanel textPanel;
+	
 	private ServerTreeCellRenderer treeCellRenderer;
 	private ServerTreeCellEditor treeCellEditor;
 	
@@ -34,29 +37,28 @@ public class MessagePanel extends JPanel {
 	 */
 	public MessagePanel() {
 		
-		selectedServers = new TreeSet<>();
-		selectedServers.add(0);
-		selectedServers.add(1);
-		selectedServers.add(4);
-		
 		messageServer = new MessageServer();
 		
 		treeCellRenderer = new ServerTreeCellRenderer();
 		treeCellEditor = new ServerTreeCellEditor();
+		textPanel = new TextPanel("Message Editor");
+		textPanel.setMaximumSize(new Dimension(200, 200));
+		textPanel.setPreferredSize(new Dimension(250, 200));
 		
+		initSelectedServers();
 		serverTree = new JTree(createTree());
 		serverTree.setCellRenderer(treeCellRenderer);
 		serverTree.setCellEditor(treeCellEditor);
 		serverTree.setEditable(true);
 		
 		serverTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-		
+
 		treeCellEditor.addCellEditorListener(new CellEditorListener() {
 			
 			@Override
 			public void editingStopped(ChangeEvent e) {
 				ServerInfo serverInfo = (ServerInfo) treeCellEditor.getCellEditorValue();
-				System.out.println(serverInfo + ": " + serverInfo.getId() + ";" + serverInfo.isChecked());
+				System.out.println("Edited: " + serverInfo + ": " + serverInfo.getId() + ";" + serverInfo.isChecked());
 				
 				int serverId = serverInfo.getId();
 				
@@ -69,8 +71,11 @@ public class MessagePanel extends JPanel {
 				messageServer.setSelectedServers(selectedServers);
 				System.out.println("Messages waiting: " + messageServer.getMessageCount());
 				
+				textPanel.appendText("\n**********************\n");
+				textPanel.appendText("Messages waiting: " + messageServer.getMessageCount() + "\n");
 				for(Message message: messageServer) {
-					System.out.println(message.getTitle());
+					textPanel.appendText(message.getTitle() + "\n");
+					
 				}
 			}
 			
@@ -84,6 +89,16 @@ public class MessagePanel extends JPanel {
 		setLayout(new BorderLayout());
 		
 		add(new JScrollPane(serverTree), BorderLayout.CENTER);
+		add(new JScrollPane(textPanel), BorderLayout.LINE_END);
+	}
+	
+	private void initSelectedServers() {
+		
+		selectedServers = new TreeSet<>();
+		
+		selectedServers.add(0);
+		selectedServers.add(1);
+		selectedServers.add(4);
 	}
 	
 	/**

@@ -44,7 +44,6 @@ public class MainFrame extends JFrame {
 	private FormPanel formPanel;
 	private JTabbedPane tabPane;
 	private TablePanel tablePanel;
-	//private TextPanel textPanel;
 	private MovingRectanglePanel rectanglePanel;
 	private MessagePanel messagePanel;
 	
@@ -55,7 +54,7 @@ public class MainFrame extends JFrame {
 
 	private Controller controller;
 	private PrefsDialog prefsDialog;
-	private Preferences prefs;
+	//private Preferences prefs;
 
 
 	// *****************************
@@ -70,7 +69,6 @@ public class MainFrame extends JFrame {
 		formPanel = new FormPanel();
 		tabPane = new JTabbedPane();
 		tablePanel = new TablePanel();
-		//textPanel = new TextPanel();
 		messagePanel = new MessagePanel();
 		rectanglePanel = new MovingRectanglePanel();
 		controller = new Controller();
