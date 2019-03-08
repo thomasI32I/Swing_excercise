@@ -1,8 +1,8 @@
 package gui;
 
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -21,6 +21,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 
 import controller.Controller;
@@ -30,24 +32,31 @@ import controller.Controller;
  *
  */
 public class MainFrame extends JFrame {
-
-	private static final long serialVersionUID = 1L;
+	
 	// Member variables *****************************
+	private static final long serialVersionUID = 1L;
+	private final static int X_PIXEL_ICON = 20;
+	private final static int Y_PIXEL_ICON = 20;
+	
 	private Toolbar toolbar;
-	private TablePanel tablePanel;
+	private JSplitPane splitPane;
+
 	private FormPanel formPanel;
+	private JTabbedPane tabPane;
+	private TablePanel tablePanel;
+	//private TextPanel textPanel;
+	private MovingRectanglePanel rectanglePanel;
+	private MessagePanel messagePanel;
 	
 	private JFileChooser fileChooser;
 
 	// from oca course excercise
-	// private MovingRectanglePanel rectanglePanel;
+	
 
 	private Controller controller;
 	private PrefsDialog prefsDialog;
 	private Preferences prefs;
 
-	private final static int X_PIXEL_ICON = 20;
-	private final static int Y_PIXEL_ICON = 20;
 
 	// *****************************
 
@@ -57,12 +66,28 @@ public class MainFrame extends JFrame {
 		setLayout(new BorderLayout());
 
 		toolbar = new Toolbar();
+		
 		formPanel = new FormPanel();
+		tabPane = new JTabbedPane();
 		tablePanel = new TablePanel();
-
+		//textPanel = new TextPanel();
+		messagePanel = new MessagePanel();
+		rectanglePanel = new MovingRectanglePanel();
 		controller = new Controller();
+		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, formPanel, tabPane);
+		splitPane.setOneTouchExpandable(true);
 		prefsDialog = new PrefsDialog(this);
+		
+		tabPane.addTab("Person Database", tablePanel);
+		tabPane.addTab("Messages", messagePanel);
+		tabPane.addTab("MovingRectangles", rectanglePanel);
+		
 		tablePanel.setData(controller.getPeople());
+		tablePanel.setPersonTableListener(new PersonTableListener() {
+			public void rowDeleted(int row) {
+				controller.removePerson(row);
+			}
+		});
 
 		formPanel.setFormListener(new FormListener() {
 			@Override
@@ -105,9 +130,7 @@ public class MainFrame extends JFrame {
 		setJMenuBar(createMenueBar());
 
 		add(toolbar, BorderLayout.PAGE_START);
-		add(formPanel, BorderLayout.LINE_START);
-		add(tablePanel, BorderLayout.CENTER);
-		// add(rectanglePanel, BorderLayout.PAGE_END);
+		add(splitPane, BorderLayout.CENTER);
 
 		addWindowListener(new WindowAdapter() {
 
@@ -122,11 +145,11 @@ public class MainFrame extends JFrame {
 		});
 
 		setMinimumSize(new Dimension(500, 400));
-		setSize(600, 500);
+		setSize(800, 500);
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setVisible(true);
 
-	}
+	} // Constructor
 
 	private JMenuBar createMenueBar() {
 		
@@ -160,12 +183,12 @@ public class MainFrame extends JFrame {
 		// ******
 
 		// menue item 1 with image
-		ImageIcon icon = rescaleImage(createImageIcon("/resources/world.png", ""), X_PIXEL_ICON, Y_PIXEL_ICON);
+		ImageIcon icon = Utils.rescaleImage(Utils.createImageIcon("/resources/world.png", ""), X_PIXEL_ICON, Y_PIXEL_ICON);
 		menuItem2 = new JMenuItem("Around the world", icon);
 		menu.add(menuItem2);
 
 		// menue item 2 with image
-		icon = rescaleImage(createImageIcon("/resources/facebook.png", ""), X_PIXEL_ICON, Y_PIXEL_ICON);
+		icon = Utils.rescaleImage(Utils.createImageIcon("/resources/facebook.png", ""), X_PIXEL_ICON, Y_PIXEL_ICON);
 		menuItem3 = new JMenuItem("Connect to facebook", icon);
 		menuItem3.addActionListener(new ActionListener() {
 			@Override
@@ -177,7 +200,7 @@ public class MainFrame extends JFrame {
 		menu.add(menuItem3);
 
 		// menue item 2 with image
-		icon = rescaleImage(createImageIcon("/resources/cloud.png", ""), X_PIXEL_ICON, Y_PIXEL_ICON);
+		icon = Utils.rescaleImage(Utils.createImageIcon("/resources/cloud.png", ""), X_PIXEL_ICON, Y_PIXEL_ICON);
 		menuItem4 = new JMenuItem("Upload to cloud", icon);
 		menu.add(menuItem4);
 
@@ -201,8 +224,8 @@ public class MainFrame extends JFrame {
 		// ******
 
 		JMenu fileMenu = new JMenu("File");
-		JMenuItem exportDataItem = new JMenuItem("Export Data...");
-		JMenuItem importDataItem = new JMenuItem("Import Data...");
+		JMenuItem exportDataItem = new JMenuItem("Export Data...", Utils.createImageIcon("/resources/Export16.gif", ""));
+		JMenuItem importDataItem = new JMenuItem("Import Data...", Utils.createImageIcon("/resources/Import16.gif", ""));
 		JMenuItem exitItem = new JMenuItem("Exit");
 
 		fileMenu.add(exportDataItem);
@@ -232,6 +255,11 @@ public class MainFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent ev) {
 				JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) ev.getSource();
+				
+				if (menuItem.isSelected()) {
+					splitPane.setDividerLocation((int)formPanel.getMinimumSize().getWidth());
+				}
+				
 				formPanel.setVisible(menuItem.isSelected());
 			}
 		});
@@ -244,6 +272,7 @@ public class MainFrame extends JFrame {
 
 		importDataItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, ActionEvent.CTRL_MASK));
 
+		//import data from a file
 		importDataItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -259,6 +288,7 @@ public class MainFrame extends JFrame {
 			}
 		});
 
+		//export data to a file
 		exportDataItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -301,7 +331,7 @@ public class MainFrame extends JFrame {
 //		JMenu submenu;
 //		JRadioButtonMenuItem rbMenuItem;
 //		JCheckBoxMenuItem cbMenuItem;
-	}
+	} // createMenuBar()
 
 	/**
 	 * 
@@ -313,42 +343,5 @@ public class MainFrame extends JFrame {
 			JOptionPane.showMessageDialog(MainFrame.this, "Cannot connect to database.", "Database Connection Problem",
 					JOptionPane.ERROR_MESSAGE);
 		}
-	}
-
-	/**
-	 * Gets image from resource directory and creates an ImageIcon.
-	 * 
-	 * @param path
-	 * @param description
-	 * @return
-	 */
-	private ImageIcon createImageIcon(String path, String description) {
-
-		java.net.URL imgURL = getClass().getResource(path);
-		System.out.println(imgURL);
-
-		if (imgURL != null) {
-			return new ImageIcon(imgURL, description);
-		} else {
-			System.err.println("Couldn't find file: " + path);
-			return null;
-		}
-	}
-
-	/**
-	 * Rescales an image to the needed size (xPixel, yPixel).
-	 * 
-	 * @param imageToScale
-	 * @param xPixel
-	 * @param yPixel
-	 * @return
-	 */
-	private ImageIcon rescaleImage(ImageIcon imageToScale, int xPixel, int yPixel) {
-
-		Image image = imageToScale.getImage(); // transform it
-		Image newimg = image.getScaledInstance(xPixel, yPixel, java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
-		imageToScale = new ImageIcon(newimg); // transform it back
-
-		return imageToScale;
 	}
 }

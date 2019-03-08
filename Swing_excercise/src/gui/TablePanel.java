@@ -1,6 +1,8 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
@@ -23,7 +25,7 @@ public class TablePanel extends JPanel {
 	private PersonTableModel tableModel;
 	private JPopupMenu popUp;
 	
-	//private PersonTableListener personTableListener;
+	private PersonTableListener personTableListener;
 	
 	
 	public TablePanel() {
@@ -32,7 +34,7 @@ public class TablePanel extends JPanel {
 		table = new JTable(tableModel);
 		popUp = new JPopupMenu();
 		
-		JMenuItem removeItem = new JMenuItem("Delete row");
+		JMenuItem removeItem = new JMenuItem("Delete row", Utils.createImageIcon("/resources/Delete16.gif", ""));
 		popUp.add(removeItem);
 		
 		//////////////
@@ -50,20 +52,20 @@ public class TablePanel extends JPanel {
 			}
 		});
 		
-//		removeItem.addActionListener(new ActionListener() {
-//			@Override
-//			public void actionPerformed(ActionEvent e) {
-//				int row = table.getSelectedRow();
-//				
-//				if (personTableListener != null) {
-//					personTableListener.rowDeleted(row);
-//					//deletes rows and causes a table refresh
-//					tableModel.fireTableRowsDeleted(row, row);
-//				}
-//				
-//				System.out.println(row);
-//			}
-//		});
+		removeItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int row = table.getSelectedRow();
+				
+				if (personTableListener != null) {
+					personTableListener.rowDeleted(row);
+					//deletes rows and causes a table refresh
+					tableModel.fireTableRowsDeleted(row, row);
+				}
+				
+				System.out.println(row);
+			}
+		});
 		//////////////
 		
 		setLayout(new BorderLayout());
@@ -79,8 +81,8 @@ public class TablePanel extends JPanel {
 		tableModel.fireTableDataChanged();
 	}
 
-//	public void setPersonTableListener(PersonTableListener personTableListener) {
-//		this.personTableListener = personTableListener;
-//	}
+	public void setPersonTableListener(PersonTableListener personTableListener) {
+		this.personTableListener = personTableListener;
+	}
 	
 }
