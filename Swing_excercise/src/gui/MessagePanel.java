@@ -2,12 +2,16 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
+import javax.swing.SwingWorker;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -58,7 +62,8 @@ public class MessagePanel extends JPanel {
 			@Override
 			public void editingStopped(ChangeEvent e) {
 				ServerInfo serverInfo = (ServerInfo) treeCellEditor.getCellEditorValue();
-				System.out.println("Edited: " + serverInfo + ": " + serverInfo.getId() + ";" + serverInfo.isChecked());
+				textPanel.appendText("\n**********************\n");
+				textPanel.appendText("Edited: " + serverInfo + ": " + serverInfo.getId() + ";" + serverInfo.isChecked() + "\n");
 				
 				int serverId = serverInfo.getId();
 				
@@ -69,16 +74,11 @@ public class MessagePanel extends JPanel {
 				}
 				
 				messageServer.setSelectedServers(selectedServers);
-				System.out.println("Messages waiting: " + messageServer.getMessageCount());
 				
-				textPanel.appendText("\n**********************\n");
-				textPanel.appendText("Messages waiting: " + messageServer.getMessageCount() + "\n");
-				for(Message message: messageServer) {
-					textPanel.appendText(message.getTitle() + "\n");
-					
-				}
+				retrieveMessages();
 			}
-			
+
+
 			@Override
 			public void editingCanceled(ChangeEvent e) {
 				
@@ -90,7 +90,62 @@ public class MessagePanel extends JPanel {
 		
 		add(new JScrollPane(serverTree), BorderLayout.CENTER);
 		add(new JScrollPane(textPanel), BorderLayout.LINE_END);
+	} //Constructor
+	
+	
+	private void retrieveMessages() {
+		
+		//print info
+		textPanel.appendText("Messages waiting: " + messageServer.getMessageCount() + "\n");
+		
+		SwingWorker<List<Message>, Integer> worker = new SwingWorker<List<Message>, Integer>() {
+			
+			@Override
+			protected void done() {
+				
+				try {
+					List<Message> retrievedMessages = get();
+					textPanel.appendText("Retrieved " + retrievedMessages.size() + " messages.");
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			@Override
+			protected void process(List<Integer> counts) {
+				
+				int retrieved = counts.get(counts.size() - 1);
+				textPanel.appendText("Got " + retrieved + " messages." + "\n");
+			}
+			
+			@Override
+			protected List<Message> doInBackground() throws Exception {
+				
+				List<Message> retrievedMessages = new ArrayList<>();
+				
+				int count = 0;
+
+				for(Message message: messageServer) {
+					textPanel.appendText(message.getTitle() + "\n");
+					retrievedMessages.add(message);
+					
+					count++;
+					publish(count);
+				}
+				
+				return retrievedMessages;
+			}
+		};
+		
+		worker.execute();
+		
 	}
+	
+	
 	
 	private void initSelectedServers() {
 		
