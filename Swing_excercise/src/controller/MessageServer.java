@@ -13,7 +13,7 @@ import model.Message;
  * This is a sort of simulated message server
  *
  */
-public class MessageServer implements Iterable<Message>{
+public class MessageServer implements Iterable<Message> {
 	
 	private Map<Integer, List<Message>> messageStorage;
 	private List<Message> selected;
@@ -71,43 +71,39 @@ public class MessageServer implements Iterable<Message>{
 
 	@Override
 	public Iterator<Message> iterator() {
-		return new MessageIterator(selected);
+		return new MessageIterator(new ArrayList<>(selected));
 	}
-}
-
-
-/**
- * 
- *
- */
-class MessageIterator implements Iterator {
 	
-	private Iterator<Message> iterator;
-	
-	public MessageIterator(List<Message> messages) {
-		iterator = messages.iterator();
-	}
-
-	@Override
-	public boolean hasNext() {
-		return iterator.hasNext();
-	}
-
-	@Override
-	public Object next() {
+	private static class MessageIterator implements Iterator<Message> {
 		
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		private Iterator<Message> iterator;
+		
+		public MessageIterator(List<Message> messages) {
+			iterator = messages.iterator();
+		}
+
+		@Override
+		public boolean hasNext() {
+			return iterator.hasNext();
+		}
+
+		@Override
+		public Message next() {		
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			return iterator.next();
+		}
+			
+		public void remove() {
+			iterator.remove();
 		}
 		
-		return iterator.next();
 	}
-	
-	
-	public void remove() {
-		iterator.remove();
-	}
-	
+
 }
+
+

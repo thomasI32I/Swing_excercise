@@ -32,7 +32,7 @@ public class Database {
 	private LinkedList<Person> people;
 
 	private Connection connection;
-	
+
 	/**
 	 * Constructor
 	 * 
@@ -46,20 +46,24 @@ public class Database {
 	 * @throws Exception
 	 */
 	public void connect() throws SQLException {
-		try {
-			Class.forName("com.mysql.jdbc.Driver");
-		} catch (ClassNotFoundException e) {
-			throw new SQLException("Driver not found");
-		}
 
-		String connectionUrl = String.format(
-				"jdbc:mysql://%s:%s/%s?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
-				DB_SERVER, DB_SERVER_PORT, DB_NAME);
-		connection = DriverManager.getConnection(connectionUrl, ROOT_USER, ROOT_USER_PW);
-		//TODO remove
-		System.out.println("Connected: " + connection);
+		if (connection == null) {
+			try {
+				Class.forName("com.mysql.jdbc.Driver");
+			} catch (ClassNotFoundException e) {
+				throw new SQLException("Driver not found");
+			}
+
+			String connectionUrl = String.format(
+					"jdbc:mysql://%s:%s/%s?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
+					DB_SERVER, DB_SERVER_PORT, DB_NAME);
+
+			connection = DriverManager.getConnection(connectionUrl, ROOT_USER, ROOT_USER_PW);
+			// TODO remove
+			System.out.println("Connected: " + connection);
+		}
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -67,6 +71,7 @@ public class Database {
 		if (connection != null) {
 			try {
 				connection.close();
+				connection = null;
 				System.out.println("Disconnect from database.");
 			} catch (SQLException e) {
 				System.out.println("Can't close connection");
@@ -83,84 +88,95 @@ public class Database {
 
 		// "?" represents a wild card
 		String checkSql = "SELECT COUNT(*) AS count FROM people WHERE id=?";
-		PreparedStatement checkStmt = connection.prepareStatement(checkSql);
+		PreparedStatement checkStmt = null;
 
 		String insertSql = "insert into people (id, name, age, employment_status, tax_id, us_citizen, gender, occupation) values (?, ?, ?, ?, ?, ?, ?, ?)";
-		PreparedStatement insertStatement = connection.prepareStatement(insertSql);
-		
+		PreparedStatement insertStatement = null;
+
 		String updateSql = "update people set name=?, age=?, employment_status=?, tax_id=?, us_citizen=?, gender=?, occupation=? where id=?";
-		PreparedStatement updateStatement = connection.prepareStatement(updateSql);
-		
-		//iterate through all available people
-		for (Person person : people) {
-			int id = person.getId();
-			String name = person.getName();
-			AgeCategory age = person.getAgeCategory();
-			EmploymentCategory emplCat = person.getEmpCat();
-			String taxId = person.getTaxId();
-			boolean isUs = person.isUsCitizen();
-			Gender gender = person.getGender();
-			String occupation = person.getOccupation();
-			
-			//substitute wildcard variable for checkStmt
-			checkStmt.setInt(1, id);
-			ResultSet checkResult = checkStmt.executeQuery();
-			checkResult.next();
-			
-			int count = checkResult.getInt(1);
-			
-			if (count == 0) {
-				System.out.println("Inserting person with ID " + id);
-				
-				int col = 1;
-				insertStatement.setInt(col++, id);
-				insertStatement.setString(col++, name);
-				insertStatement.setString(col++, age.name());
-				insertStatement.setString(col++, emplCat.name());
-				insertStatement.setString(col++, taxId);
-				insertStatement.setBoolean(col++, isUs);
-				insertStatement.setString(col++, gender.name());
-				insertStatement.setString(col, occupation);
-				
-				insertStatement.executeUpdate();
-			} else {
-				System.out.println("Updating person with ID " + id);
-				
-				int col = 1;
-				updateStatement.setString(col++, name);
-				updateStatement.setString(col++, age.name());
-				updateStatement.setString(col++, emplCat.name());
-				updateStatement.setString(col++, taxId);
-				updateStatement.setBoolean(col++, isUs);
-				updateStatement.setString(col++, gender.name());
-				updateStatement.setString(col++, occupation);
-				updateStatement.setInt(col, id);
-				
-				updateStatement.executeUpdate();
+		PreparedStatement updateStatement = null;
+
+		try {
+			checkStmt = connection.prepareStatement(checkSql);
+			insertStatement = connection.prepareStatement(insertSql);
+			updateStatement = connection.prepareStatement(updateSql);
+
+			// iterate through all available people
+			for (Person person : people) {
+				int id = person.getId();
+				String name = person.getName();
+				AgeCategory age = person.getAgeCategory();
+				EmploymentCategory emplCat = person.getEmpCat();
+				String taxId = person.getTaxId();
+				boolean isUs = person.isUsCitizen();
+				Gender gender = person.getGender();
+				String occupation = person.getOccupation();
+
+				// substitute wildcard variable for checkStmt
+				checkStmt.setInt(1, id);
+				ResultSet checkResult = checkStmt.executeQuery();
+				checkResult.next();
+
+				int count = checkResult.getInt(1);
+
+				if (count == 0) {
+					System.out.println("Inserting person with ID " + id);
+
+					int col = 1;
+					insertStatement.setInt(col++, id);
+					insertStatement.setString(col++, name);
+					insertStatement.setString(col++, age.name());
+					insertStatement.setString(col++, emplCat.name());
+					insertStatement.setString(col++, taxId);
+					insertStatement.setBoolean(col++, isUs);
+					insertStatement.setString(col++, gender.name());
+					insertStatement.setString(col, occupation);
+
+					insertStatement.executeUpdate();
+				} else {
+					System.out.println("Updating person with ID " + id);
+
+					int col = 1;
+					updateStatement.setString(col++, name);
+					updateStatement.setString(col++, age.name());
+					updateStatement.setString(col++, emplCat.name());
+					updateStatement.setString(col++, taxId);
+					updateStatement.setBoolean(col++, isUs);
+					updateStatement.setString(col++, gender.name());
+					updateStatement.setString(col++, occupation);
+					updateStatement.setInt(col, id);
+
+					updateStatement.executeUpdate();
+				}
+			}
+		} finally {
+			try {
+				checkStmt.close();
+			} finally {
+				try {
+					insertStatement.close();
+				} finally {
+					updateStatement.close();
+				}
 			}
 		}
-		
-		checkStmt.close();
-		insertStatement.close();
-		updateStatement.close();
-		
 	}
-	
+
 	/**
 	 * Loads all available persons from db into person objects.
 	 * 
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
 	public void load() throws SQLException {
-		
+
 		people.clear();
-		
+
 		Statement selectStatement = connection.createStatement();
 		String sql = "select id, name, age, employment_status, tax_id, us_citizen, gender, occupation from people order by name";
 		ResultSet results = selectStatement.executeQuery(sql);
-		
-		while(results.next()) {
-			
+
+		while (results.next()) {
+
 			int id = results.getInt("id");
 			String name = results.getString("name");
 			String occ = results.getString("occupation");
@@ -169,22 +185,15 @@ public class Database {
 			boolean isUs = results.getBoolean("us_citizen");
 			String tax = results.getString("tax_id");
 			String gender = results.getString("gender");
-			
-			
-			Person person = new Person(id,
-									   name,
-									   occ,
-									   AgeCategory.valueOf(age),
-									   EmploymentCategory.valueOf(emp),
-									   isUs,
-									   tax,
-									   Gender.valueOf(gender));
+
+			Person person = new Person(id, name, occ, AgeCategory.valueOf(age), EmploymentCategory.valueOf(emp), isUs,
+					tax, Gender.valueOf(gender));
 			people.add(person);
 		}
-		
+
 		results.close();
 		selectStatement.close();
-		
+
 	}
 
 	public void addPerson(Person person) {
