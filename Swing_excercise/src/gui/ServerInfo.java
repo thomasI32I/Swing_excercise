@@ -8,7 +8,11 @@ public class ServerInfo {
 	private boolean isChecked;
 	
 	/**
+	 * Constructor
 	 * 
+	 * @param name Name of the server.
+	 * @param id
+	 * @param checked
 	 */
 	public ServerInfo(String name, int id, boolean checked) {
 		this.name = name;

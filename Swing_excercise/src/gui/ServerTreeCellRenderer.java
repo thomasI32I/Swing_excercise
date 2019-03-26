@@ -43,7 +43,6 @@ public class ServerTreeCellRenderer implements TreeCellRenderer {
 		selectionBackground = UIManager.getColor("Tree.selectionBackground");
 	}
 	
-	
 	@Override
 	public Component getTreeCellRendererComponent(JTree tree,
 												  Object value,

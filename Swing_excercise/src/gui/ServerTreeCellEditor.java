@@ -26,22 +26,22 @@ public class ServerTreeCellEditor extends AbstractCellEditor implements TreeCell
 	public ServerTreeCellEditor() {
 		renderer = new ServerTreeCellRenderer();
 	}
-	
+
 	@Override
 	public Component getTreeCellEditorComponent(JTree tree, Object value, boolean isSelected, boolean expanded,
 			boolean leaf, int row) {
 
-		Component component = renderer.getTreeCellRendererComponent(tree, value, isSelected, expanded, leaf,
-				row, true);
-		
-		if (leaf) {
-			
-			DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode)value;
+		Component component = renderer.getTreeCellRendererComponent(tree, value, isSelected, expanded, leaf, row, true);
+
+		if (leaf) { //a leaf is always of type JCheckBox
+
+			DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) value;
+			//store underlying data object
 			serverInfo = (ServerInfo) treeNode.getUserObject();
-			
+
 			checkBox = (JCheckBox) component;
 			ItemListener itemListener = new ItemListener() {
-				
+
 				@Override
 				public void itemStateChanged(ItemEvent e) {
 					fireEditingStopped();
@@ -53,10 +53,10 @@ public class ServerTreeCellEditor extends AbstractCellEditor implements TreeCell
 
 		return component;
 	}
-	
+
 	@Override
 	public Object getCellEditorValue() {
-		
+
 		serverInfo.setChecked(checkBox.isSelected());
 		return serverInfo;
 	}
@@ -64,20 +64,23 @@ public class ServerTreeCellEditor extends AbstractCellEditor implements TreeCell
 	@Override
 	public boolean isCellEditable(EventObject anEvent) {
 		
-		if (!(anEvent instanceof MouseEvent)) return false;
+		if (!(anEvent instanceof MouseEvent))
+			return false;
 		
 		MouseEvent mouseEvent = (MouseEvent) anEvent;
-		JTree tree = (JTree) anEvent.getSource();		
+		JTree tree = (JTree) anEvent.getSource();
 		TreePath path = tree.getPathForLocation(mouseEvent.getX(), mouseEvent.getY());
-		
-		if (path == null) return false;
-		
+
+		if (path == null)
+			return false;
+
 		Object lastComponent = path.getLastPathComponent();
-		
-		if (lastComponent == null) return false;
-		
+
+		if (lastComponent == null)
+			return false;
+
 		DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) lastComponent;
-		
+
 		return treeNode.isLeaf();
 	}
 }
