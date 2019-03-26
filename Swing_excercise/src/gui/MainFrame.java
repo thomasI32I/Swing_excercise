@@ -47,10 +47,7 @@ public class MainFrame extends JFrame {
 	private MessagePanel messagePanel;
 	
 	private JFileChooser fileChooser;
-
-	// from oca course excercise
 	
-
 	private Controller controller;
 	private PrefsDialog prefsDialog;
 	//private Preferences prefs;
@@ -66,10 +63,12 @@ public class MainFrame extends JFrame {
 		toolbar = new Toolbar();
 		
 		formPanel = new FormPanel();
+		
 		tabPane = new JTabbedPane();
 		tablePanel = new TablePanel();
 		messagePanel = new MessagePanel(this);
 		rectanglePanel = new MovingRectanglePanel();
+		
 		controller = new Controller();
 		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, formPanel, tabPane);
 		splitPane.setOneTouchExpandable(true);
@@ -160,7 +159,6 @@ public class MainFrame extends JFrame {
 		JMenuItem menuItem4;
 		JMenuItem menuItem5;
 		
-
 		// can be short cutted by alt + a
 		menu.setMnemonic(KeyEvent.VK_A);
 		menu.getAccessibleContext().setAccessibleDescription("The only menu in this programm that has menu items.");

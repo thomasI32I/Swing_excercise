@@ -9,8 +9,10 @@ import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.SwingWorker;
 import javax.swing.event.CellEditorListener;
@@ -28,7 +30,6 @@ import model.Message;
 public class MessagePanel extends JPanel implements ProgressDialogListener {
 
 	private JTree serverTree;
-	private TextPanel textPanel;
 
 	private ServerTreeCellRenderer treeCellRenderer;
 	private ServerTreeCellEditor treeCellEditor;
@@ -37,6 +38,11 @@ public class MessagePanel extends JPanel implements ProgressDialogListener {
 	private MessageServer messageServer;
 	private ProgressDialog progressDialog;
 	private SwingWorker<List<Message>, Integer> worker;
+	
+	private TextPanel textPanel;
+	private JList<String> messageList;
+	private JSplitPane upperPane;
+	private JSplitPane lowerPane;
 
 	/**
 	 * Constructor
@@ -48,9 +54,6 @@ public class MessagePanel extends JPanel implements ProgressDialogListener {
 
 		treeCellRenderer = new ServerTreeCellRenderer();
 		treeCellEditor = new ServerTreeCellEditor();
-		textPanel = new TextPanel("Message Editor");
-		textPanel.setMaximumSize(new Dimension(200, 200));
-		textPanel.setPreferredSize(new Dimension(250, 200));
 
 		initSelectedServers();
 		serverTree = new JTree(createTree());
@@ -92,9 +95,20 @@ public class MessagePanel extends JPanel implements ProgressDialogListener {
 		progressDialog.setProgressDialogListener(this);
 
 		setLayout(new BorderLayout());
+		
+		textPanel = new TextPanel();
+		messageList = new JList<>();
+		
+		lowerPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, messageList, textPanel);
+		upperPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(serverTree), lowerPane);
+		
+		textPanel.setMinimumSize(new Dimension(10, 100));
+		messageList.setMinimumSize(new Dimension(10, 100));
 
-		add(new JScrollPane(serverTree), BorderLayout.CENTER);
-		add(new JScrollPane(textPanel), BorderLayout.LINE_END);
+		upperPane.setResizeWeight(0.5);
+		lowerPane.setResizeWeight(0.5);
+		
+		add(upperPane, BorderLayout.CENTER);
 	} // Constructor
 
 	/**
@@ -109,7 +123,6 @@ public class MessagePanel extends JPanel implements ProgressDialogListener {
 
 			@Override
 			protected void done() {
-
 				progressDialog.setVisible(false);
 
 				if (isCancelled())
