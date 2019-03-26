@@ -74,7 +74,9 @@ public class MessageServer implements Iterable<Message> {
 		return new MessageIterator(new ArrayList<>(selected));
 	}
 	
-	//Inner class
+	/**
+	 * Inner class which provides iterator functionality
+	 */
 	private static class MessageIterator implements Iterator<Message> {
 		
 		private Iterator<Message> iterator;
@@ -93,7 +95,7 @@ public class MessageServer implements Iterable<Message> {
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				
 			}
 			
 			return iterator.next();
