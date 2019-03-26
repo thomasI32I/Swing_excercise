@@ -74,6 +74,7 @@ public class MessageServer implements Iterable<Message> {
 		return new MessageIterator(new ArrayList<>(selected));
 	}
 	
+	//Inner class
 	private static class MessageIterator implements Iterator<Message> {
 		
 		private Iterator<Message> iterator;
@@ -101,9 +102,8 @@ public class MessageServer implements Iterable<Message> {
 		public void remove() {
 			iterator.remove();
 		}
-		
 	}
-
+	
 }
 
 
