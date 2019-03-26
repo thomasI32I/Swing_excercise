@@ -69,7 +69,7 @@ public class MainFrame extends JFrame {
 		formPanel = new FormPanel();
 		tabPane = new JTabbedPane();
 		tablePanel = new TablePanel();
-		messagePanel = new MessagePanel();
+		messagePanel = new MessagePanel(this);
 		rectanglePanel = new MovingRectanglePanel();
 		controller = new Controller();
 		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, formPanel, tabPane);

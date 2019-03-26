@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
@@ -22,7 +23,7 @@ import model.Message;
 
 
 /**
- * 
+ * This components displays available servers in a tree.
  *
  */
 public class MessagePanel extends JPanel {
@@ -35,13 +36,15 @@ public class MessagePanel extends JPanel {
 	
 	private Set<Integer> selectedServers;
 	private MessageServer messageServer;
+	private ProgressDialog progressDialog;
 	
 	/**
 	 * Constructor
 	 */
-	public MessagePanel() {
+	public MessagePanel(JFrame mainFrame) {
 		
 		messageServer = new MessageServer();
+		progressDialog = new ProgressDialog(mainFrame);
 		
 		treeCellRenderer = new ServerTreeCellRenderer();
 		treeCellEditor = new ServerTreeCellEditor();
@@ -92,44 +95,45 @@ public class MessagePanel extends JPanel {
 		add(new JScrollPane(textPanel), BorderLayout.LINE_END);
 	} //Constructor
 	
-	
+	/**
+	 * 
+	 */
 	private void retrieveMessages() {
+		progressDialog.setMaximum(messageServer.getMessageCount());
+		progressDialog.setVisible(true);
 		
-		//print info
-		textPanel.appendText("Messages waiting: " + messageServer.getMessageCount() + "\n");
-		
+		//Implementation of a swing worker
 		SwingWorker<List<Message>, Integer> worker = new SwingWorker<List<Message>, Integer>() {
 			
 			@Override
 			protected void done() {
-				
 				try {
 					List<Message> retrievedMessages = get();
-					textPanel.appendText("Retrieved " + retrievedMessages.size() + " messages.");
+					textPanel.appendText("Retrieved " + retrievedMessages.size() + " messages." + "\n");
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (ExecutionException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				
+				progressDialog.setVisible(false);
 			}
 			
 			@Override
 			protected void process(List<Integer> counts) {
 				
 				int retrieved = counts.get(counts.size() - 1);
+				progressDialog.setValue(retrieved);
 				textPanel.appendText("Got " + retrieved + " messages." + "\n");
 			}
 			
 			@Override
 			protected List<Message> doInBackground() throws Exception {
-				
 				List<Message> retrievedMessages = new ArrayList<>();
 				
 				int count = 0;
 
-				for(Message message: messageServer) {
+				for (Message message: messageServer) {
 					textPanel.appendText(message.getTitle() + "\n");
 					retrievedMessages.add(message);
 					
@@ -142,10 +146,7 @@ public class MessagePanel extends JPanel {
 		};
 		
 		worker.execute();
-		
 	}
-	
-	
 	
 	private void initSelectedServers() {
 		
