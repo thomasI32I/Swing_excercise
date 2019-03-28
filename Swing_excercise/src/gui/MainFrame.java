@@ -23,6 +23,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import controller.Controller;
 
@@ -82,6 +84,19 @@ public class MainFrame extends JFrame {
 		tablePanel.setPersonTableListener(new PersonTableListener() {
 			public void rowDeleted(int row) {
 				controller.removePerson(row);
+			}
+		});
+		
+		tabPane.addChangeListener(new ChangeListener() {
+			
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				int tabIndex = tabPane.getSelectedIndex();
+				System.out.println(tabIndex);
+				
+				if (tabIndex == 1) {
+					messagePanel.refresh();
+				}
 			}
 		});
 
