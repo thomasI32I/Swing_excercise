@@ -133,6 +133,18 @@ public class MainFrame extends JFrame {
 				}
 				tablePanel.refresh();
 			}
+
+			@Override
+			public void fontTypeChangeOccured(String fontType) {
+				if (fontType != null) {
+					messagePanel.setFont(fontType, -1, -1);
+				}
+			}
+
+			@Override
+			public void fontSizeChangeOccured(int fontSize) {
+				messagePanel.setFont("", -1, fontSize);
+			}
 		});
 		
 		fileChooser = new JFileChooser();

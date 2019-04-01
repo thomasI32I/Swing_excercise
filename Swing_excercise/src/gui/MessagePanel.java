@@ -245,4 +245,9 @@ public class MessagePanel extends JPanel implements ProgressDialogListener {
 		}
 
 	}
+	
+	public void setFont(String type, int style, int size) {
+		
+		textPanel.setFont(type, style, size);
+	}
 }

@@ -16,6 +16,10 @@ import javax.swing.JTextArea;
 public class TextPanel extends JPanel {
 	
 	private JTextArea textArea;
+	
+	private String fontType;
+	private int fontStyle;
+	private int fontSize;
 
 	/**
 	 * Constructor
@@ -23,8 +27,12 @@ public class TextPanel extends JPanel {
 	public TextPanel() {
 		
 		textArea = new JTextArea();
+		fontType = Font.SERIF;
+		fontStyle = Font.PLAIN;
+		fontSize = 11;
+		
 		textArea.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-		textArea.setFont(new Font("SanSerif", Font.PLAIN, 20));
+		textArea.setFont(new Font(fontType, fontStyle, fontSize));
 		
 		setLayout(new BorderLayout());		
 		add(new JScrollPane(textArea), BorderLayout.CENTER);
@@ -37,7 +45,7 @@ public class TextPanel extends JPanel {
 		
 		textArea = new JTextArea(name);
 		textArea.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-		textArea.setFont(new Font("Serif", Font.PLAIN, 20));
+		textArea.setFont(new Font(fontType, fontStyle, fontSize));
 		
 		setLayout(new BorderLayout());		
 		add(new JScrollPane(textArea), BorderLayout.CENTER);
@@ -53,5 +61,13 @@ public class TextPanel extends JPanel {
 	
 	public void setText(String text) {
 		textArea.setText(text);
+	}
+	
+	public void setFont(String type, int style, int size) {
+		fontType = type.equals("") ? fontType : type;
+		fontStyle = (style == -1) ? fontStyle : style;
+		fontSize = (size == -1) ? fontSize : size;
+		
+		textArea.setFont(new Font(fontType, fontStyle, fontSize));
 	}
 }
