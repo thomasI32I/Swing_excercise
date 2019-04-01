@@ -3,7 +3,6 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -19,6 +18,8 @@ import javax.swing.JTree;
 import javax.swing.SwingWorker;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -73,12 +74,8 @@ public class MessagePanel extends JPanel implements ProgressDialogListener {
 			public void editingStopped(ChangeEvent e) {
 				// get currently edited treeCellValue
 				ServerInfo serverInfo = (ServerInfo) treeCellEditor.getCellEditorValue();
-				textPanel.appendText("\n**********************\n");
-				textPanel.appendText(
-						"Edited: " + serverInfo + ": " + serverInfo.getId() + ";" + serverInfo.isChecked() + "\n");
-
+				
 				int serverId = serverInfo.getId();
-
 				if (serverInfo.isChecked()) {
 					selectedServers.add(serverId);
 				} else {
@@ -102,6 +99,18 @@ public class MessagePanel extends JPanel implements ProgressDialogListener {
 		textPanel = new TextPanel();
 		messageList = new JList<>(messageListModel);
 		messageList.setCellRenderer(new MessageListRenderer());
+		messageList.addListSelectionListener(new ListSelectionListener() {
+			
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				Message message = (Message) messageList.getSelectedValue();
+				if (message != null) {
+					textPanel.setText(message.getContents());
+				} else {
+					textPanel.setText("");
+				}
+			}
+		});
 		
 		lowerPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(messageList), textPanel);
 		upperPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(serverTree), lowerPane);
@@ -134,11 +143,14 @@ public class MessagePanel extends JPanel implements ProgressDialogListener {
 
 				try {
 					List<Message> retrievedMessages = get();
-					textPanel.appendText("Retrieved " + retrievedMessages.size() + " messages." + "\n");
+					
 					messageListModel.removeAllElements();
 					for (Message message : retrievedMessages) {
 						messageListModel.addElement(message);
 					}
+					
+					messageList.setSelectedIndex(0);
+					
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				} catch (ExecutionException e) {
@@ -150,7 +162,6 @@ public class MessagePanel extends JPanel implements ProgressDialogListener {
 			protected void process(List<Integer> counts) {
 				int retrieved = counts.get(counts.size() - 1);
 				progressDialog.setValue(retrieved);
-				textPanel.appendText("Got " + retrieved + " messages." + "\n");
 			}
 
 			@Override
@@ -163,7 +174,6 @@ public class MessagePanel extends JPanel implements ProgressDialogListener {
 					
 					if (isCancelled()) break;
 					
-					textPanel.appendText(message.getTitle() + "\n");
 					retrievedMessages.add(message);
 
 					count++;

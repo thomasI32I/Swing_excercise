@@ -1,7 +1,10 @@
 package gui;
 
+import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.Image;
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.ImageIcon;
 
@@ -54,5 +57,35 @@ public class Utils {
 		imageToScale = new ImageIcon(newimg); // transform it back
 
 		return imageToScale;
+	}
+	
+	/**
+	 * 
+	 * @param path
+	 * @param description
+	 * @return
+	 * @throws IOException 
+	 * @throws FontFormatException 
+	 */
+	public static Font createFont(String path, String description) {
+
+		java.net.URL url = System.class.getResource(path);
+		
+		Font font = null;
+		
+		if (url != null) {
+			try {
+				font = Font.createFont(Font.TRUETYPE_FONT, url.openStream());
+			} catch (FontFormatException e) {
+				System.err.println("Bad format in font file: " + path);
+			} catch (IOException e) {
+				System.out.println("Unable to read font file" + path);
+			}
+			return font;
+			
+		} else {
+			System.err.println("Couldn't find font: " + path);
+			return font;
+		}
 	}
 }

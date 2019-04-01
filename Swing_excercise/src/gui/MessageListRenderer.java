@@ -3,6 +3,7 @@ package gui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.Font;
 
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -13,7 +14,7 @@ import model.Message;
 
 /**
  * 
- * Note -- this demonstrates using a arbitrary component as a list box renderer.
+ * Note -- this demonstrates using an arbitrary component as a list box renderer.
  * (Probably overkill in this case to use JPanel when JLabel could be used directly.)
  *
  */
@@ -29,6 +30,11 @@ public class MessageListRenderer implements ListCellRenderer<Message> {
 		panel = new JPanel();
 		label = new JLabel();
 		
+		label.setFont(Utils.createFont("/fonts/CrimewaveBB.ttf", "").deriveFont(Font.BOLD, 20));
+		
+		selectedColor = new Color(210, 210, 255);
+		normalColor = Color.WHITE;
+		
 		label.setIcon(Utils.createImageIcon("/resources/Information24.gif", ""));
 		
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -40,9 +46,6 @@ public class MessageListRenderer implements ListCellRenderer<Message> {
 	@Override
 	public Component getListCellRendererComponent(JList<? extends Message> list, Message value, int index,
 			boolean isSelected, boolean cellHasFocus) {
-		
-		selectedColor = new Color(210, 210, 255);
-		normalColor = Color.WHITE;
 		
 		Message message = (Message) value;
 		label.setText(message.getTitle());
