@@ -60,10 +60,11 @@ public class Utils {
 	}
 	
 	/**
+	 * Creates a font object.
 	 * 
-	 * @param path
+	 * @param path Path of the font to use.
 	 * @param description
-	 * @return
+	 * @return Font object
 	 * @throws IOException 
 	 * @throws FontFormatException 
 	 */
@@ -81,11 +82,10 @@ public class Utils {
 			} catch (IOException e) {
 				System.out.println("Unable to read font file" + path);
 			}
-			return font;
-			
 		} else {
 			System.err.println("Couldn't find font: " + path);
-			return font;
 		}
+		
+		return font;
 	}
 }
