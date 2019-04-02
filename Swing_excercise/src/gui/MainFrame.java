@@ -343,16 +343,11 @@ public class MainFrame extends JFrame {
 			}
 		});
 		
-		//////////////
 		menuBar.add(fileMenu);
 		menuBar.add(windowMenu);
 		menuBar.add(menu);
 
 		return menuBar;
-
-//		JMenu submenu;
-//		JRadioButtonMenuItem rbMenuItem;
-//		JCheckBoxMenuItem cbMenuItem;
 	} // createMenuBar()
 
 	/**

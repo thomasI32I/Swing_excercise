@@ -46,6 +46,7 @@ public class Toolbar extends JToolBar implements ActionListener {
 		fontType = new JComboBox<>(fontTypes);
 		fontType.setSelectedIndex(0);
 		fontType.setMaximumSize(new Dimension(120, (int)itemHight));
+		fontType.setToolTipText("Font type");
 		fontType.addActionListener(new ActionListener() {
 			
 			@Override
@@ -59,6 +60,7 @@ public class Toolbar extends JToolBar implements ActionListener {
 		fontSize = new JComboBox<>(fontSizes);
 		fontSize.setSelectedIndex(0);
 		fontSize.setMaximumSize(new Dimension(50, (int)itemHight));
+		fontSize.setToolTipText("Font size");
 		fontSize.addActionListener(new ActionListener() {
 			
 			@Override
