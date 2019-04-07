@@ -22,16 +22,21 @@ import java.util.List;
  *
  */
 public class Database {
-
-	private final static String ROOT_USER = "root";
-	private final static String ROOT_USER_PW = "Tomislaw33!!!";
+	
 	private final static String DB_SERVER = "localhost";
-	private final static String DB_SERVER_PORT = "3306";
 	private final static String DB_NAME = "swingtest";
+	
+//	private final static String DB_SERVER_PORT = "3306";
+//	private final static String ROOT_USER = "root";
+//	private final static String ROOT_USER_PW = "Tomislaw33!!!";
+	
 
 	private LinkedList<Person> people;
-
 	private Connection connection;
+	
+	private int port;
+	private String user;
+	private String password;
 
 	/**
 	 * Constructor
@@ -40,6 +45,18 @@ public class Database {
 	public Database() {
 		people = new LinkedList<>();
 	}
+	
+	public void configure(int port, String user, String password) throws SQLException {
+		this.port = port;
+		this.user = user;
+		this.password = password;
+		
+		if (connection != null) {
+			disconnect();
+			connect();
+		}
+	}
+	
 
 	/**
 	 * 
@@ -56,9 +73,9 @@ public class Database {
 
 			String connectionUrl = String.format(
 					"jdbc:mysql://%s:%s/%s?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
-					DB_SERVER, DB_SERVER_PORT, DB_NAME);
+					DB_SERVER, port, DB_NAME);
 
-			connection = DriverManager.getConnection(connectionUrl, ROOT_USER, ROOT_USER_PW);
+			connection = DriverManager.getConnection(connectionUrl, user, password);
 			// TODO remove
 			System.out.println("Connected: " + connection);
 		}

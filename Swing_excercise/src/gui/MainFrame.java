@@ -11,7 +11,9 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.prefs.Preferences;
 
+import javax.naming.ConfigurationException;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
@@ -52,7 +54,7 @@ public class MainFrame extends JFrame {
 	
 	private Controller controller;
 	private PrefsDialog prefsDialog;
-	//private Preferences prefs;
+	private Preferences prefs;
 
 
 	// *****************************
@@ -70,6 +72,8 @@ public class MainFrame extends JFrame {
 		tablePanel = new TablePanel();
 		messagePanel = new MessagePanel(this);
 		rectanglePanel = new MovingRectanglePanel();
+		
+		prefs = Preferences.userRoot().node("db");
 		
 		controller = new Controller();
 		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, formPanel, tabPane);
@@ -99,6 +103,32 @@ public class MainFrame extends JFrame {
 				}
 			}
 		});
+		
+		prefsDialog.setPrefsListener(new PrefsListener() {
+			
+			@Override
+			public void preferencesSet(String user, String password, int port) {
+				prefs.put("user", user);
+				prefs.put("password", password);
+				prefs.putInt("port", port);
+				
+				try {
+					controller.configure(port, user, password);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		
+		String user = prefs.get("user", "");
+		String password = prefs.get("password", "");
+		Integer port = prefs.getInt("port", 3306);
+		prefsDialog.setDefaults(user, password, port);
+		try {
+			controller.configure(port, user, password);
+		} catch (Exception e) {
+			System.err.println("Can't connect to database");
+		}
 
 		formPanel.setFormListener(new FormListener() {
 			@Override
@@ -286,6 +316,8 @@ public class MainFrame extends JFrame {
 			}
 		});
 
+		prefsItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK));
+		
 		// setting mnemonic for menu items
 		fileMenu.setMnemonic(KeyEvent.VK_F);
 		exitItem.setMnemonic(KeyEvent.VK_X);

@@ -96,7 +96,11 @@ public class Controller {
 		db.load();
 	}
 
-	public void connect() throws SQLException  {
+	public void configure(int port, String user, String password) throws Exception {
+		db.configure(port, user, password);
+	}
+
+	public void connect() throws SQLException {
 		db.connect();
 	}
 
